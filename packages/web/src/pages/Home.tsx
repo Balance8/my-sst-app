@@ -1,21 +1,24 @@
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
-import { useTypedQuery } from "@my-sst-app/graphql/urql";
-import Empty from "../components/Empty";
-import Navbar from "../components/Navbar";
-import Loading from "../components/Loading";
-import styles from "./Home.module.css";
+import { useTypedQuery } from '@my-sst-app/graphql/urql';
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import Empty from '../components/Empty';
+import Loading from '../components/Loading';
+import Navbar from '../components/Navbar';
+import styles from './Home.module.css';
 
 export default function Home() {
   // Handle empty document cache
   // https://formidable.com/open-source/urql/docs/basics/document-caching/#adding-typenames
-  const context = useMemo(() => ({ additionalTypenames: ["Article"] }), []);
+  const context = useMemo(() => ({ additionalTypenames: ['Article', 'Comments'] }), []);
   const [articles] = useTypedQuery({
     query: {
       articles: {
         id: true,
         url: true,
         title: true,
+        comments: {
+          id: true,
+        },
       },
     },
     context,
@@ -35,9 +38,14 @@ export default function Home() {
                   <Link to={`/article/${article.id}`}>{article.title}</Link>
                 </h2>
                 &nbsp;
-                <a target="_blank" href={article.url} className={styles.url}>
-                  ({article.url.replace(/(^\w+:|^)\/\//, "")})
+                <a target='_blank' href={article.url} className={styles.url}>
+                  ({article.url.replace(/(^\w+:|^)\/\//, '')})
                 </a>
+              </div>
+              <div className={styles.footer}>
+                <strong>{article.comments.length}</strong>
+                <span className={styles.footerSeparator}>&bull;</span>
+                <Link to={`/article/${article.id}`}>View Comments</Link>
               </div>
             </li>
           ))}

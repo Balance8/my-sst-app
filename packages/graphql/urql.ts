@@ -1,27 +1,26 @@
+// @ts-nocheck
 import {
-  useQuery,
-  useClient,
-  createClient,
-  createRequest,
-  RequestPolicy,
-  OperationResult,
-  UseMutationState,
   OperationContext,
-  defaultExchanges,
+  OperationResult,
+  RequestPolicy,
   UseMutationResponse,
-} from "urql";
+  UseMutationState,
+  createRequest,
+  useClient,
+  useQuery,
+} from 'urql';
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  QueryResult,
-  QueryRequest,
-  MutationResult,
   MutationRequest,
-  generateQueryOp,
+  MutationResult,
+  QueryRequest,
+  QueryResult,
   generateMutationOp,
-} from "./genql";
+  generateQueryOp,
+} from './genql';
 
-import { pipe, toPromise } from "wonka";
+import { pipe, toPromise } from 'wonka';
 
 export function useTypedQuery<Query extends QueryRequest>(opts: {
   query: Query;
@@ -56,8 +55,7 @@ export function useTypedMutation<
 ): UseMutationResponse<Data, Variables> {
   const client = useClient();
   const isMounted = useRef(true);
-  const [state, setState] =
-    useState<UseMutationState<Data, Variables>>(initialState);
+  const [state, setState] = useState<UseMutationState<Data, Variables>>(initialState);
   const executeMutation = useCallback(
     (
       vars?: Variables,
@@ -68,10 +66,10 @@ export function useTypedMutation<
       const built = builder(buildArgs);
       const { query, variables } = generateMutationOp(built);
       return pipe(
-        client.executeMutation<Data, Variables>(
-          createRequest(query, variables as Variables),
-          { ...opts, ...context }
-        ),
+        client.executeMutation<Data, Variables>(createRequest(query, variables as Variables), {
+          ...opts,
+          ...context,
+        }),
         toPromise
       ).then((result: OperationResult<Data, Variables>) => {
         if (isMounted.current) {
